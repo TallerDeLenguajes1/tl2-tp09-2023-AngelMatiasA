@@ -99,7 +99,7 @@ public class UsuarioRepository
             }
             connection.Close();
         }
-        if (buscado.Id == null)
+        if (buscado.Id == 0)
         {
             return null;
         }
@@ -107,7 +107,8 @@ public class UsuarioRepository
         return buscado;
     }
 
-    public void EliminarUsuario(int idUsuario){
+    public bool EliminarUsuario(int idUsuario){
+        int rowAffected = 0;
         using(var connection = new SQLiteConnection(connectionString))
         {
             connection.Open();
@@ -115,8 +116,14 @@ public class UsuarioRepository
             var command = new SQLiteCommand(queryString, connection);
             command.Parameters.Add(new SQLiteParameter("@idUsuario", idUsuario));
 
-            command.ExecuteNonQuery();
+            rowAffected = command.ExecuteNonQuery();
             connection.Close();
         }
+         if (rowAffected!=1)
+        {
+            return false ;
+        
+        }
+        return true;
     }
 }
