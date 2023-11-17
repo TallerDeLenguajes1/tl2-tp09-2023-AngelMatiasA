@@ -15,17 +15,17 @@ public class TareaController : ControllerBase
         TareaRepo = new TareaRepository();
     }
 
-    // [HttpGet("/api/Tarea/MostrarTareas")]
-    // public ActionResult<IEnumerable<Tarea>> MostrarTareas()
-    // {
-    //     var Tareas = TareaRepo.MostrarTareas();
-    //     if (Tareas.Count == 0)
-    //     {
-    //         return BadRequest("No se pudo obtener la lista de Tareas de la base de datos");
+    [HttpGet("/api/Tarea/CantidadPorEstado")]
+    public ActionResult<int> MostrarTareas()
+    {
+        var Tareas = TareaRepo.MostrarTareas();
+        if (Tareas.Count == 0)
+        {
+            return BadRequest("No hay tareas");
 
-    //     }
-    //     return Ok(Tareas);
-    // }
+        }
+        return Ok(Tareas);
+    }
 
      [HttpGet]
     [Route("/api/Tarea/ObtenerPorUsuarioId")]
@@ -151,6 +151,25 @@ public class TareaController : ControllerBase
                 
             }
             return Ok("Tarea eliminado ");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(" Error: " + ex.Message);
+        }
+    }
+     [HttpGet("/api/Tarea/PorEstado{estado}")]
+    public ActionResult<int> CantidadPorEstado(int estado)
+    {
+        int cantidad = 0;
+        try
+        {
+            cantidad =TareaRepo.CantidadTareasPorEstado(estado);
+            if(cantidad == 0)
+            {
+            return BadRequest("No hay tareas con ese estado");
+                
+            }
+            return Ok(cantidad);
         }
         catch (Exception ex)
         {

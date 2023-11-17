@@ -33,6 +33,36 @@ public class TareaRepository
         return nuevaTarea ;
     }
 
+     public List<Tarea> MostrarTareas(){
+        List<Tarea> Tareas = new List<Tarea>();
+        using(var connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+            string queryString = @"SELECT * FROM Tarea;";
+            var command = new SQLiteCommand(queryString, connection);
+            using(var reader = command.ExecuteReader())
+            {
+                while(reader.Read()){
+                    var Tarea = new Tarea();
+                    Tarea.Id = Convert.ToInt32(reader["id"]);
+                    Tarea.Id_Tablero = Convert.ToInt32(reader["id_tablero"]);
+                    Tarea.Nombre = reader["Nombre"].ToString();
+                    Tarea.Estado = (Estado) Convert.ToInt32(reader["estado"]);
+                    Tarea.Descripcion = reader["descripcion"].ToString();
+                    Tarea.Color = reader["color"].ToString();
+                    Tarea.Id_usuario_asignado=Convert.ToInt32(reader["id_usuario_asignado"]);
+                    Tareas.Add(Tarea);
+                }
+            }
+            connection.Close();
+        }
+        if(Tareas.Count == 0){
+            return null;
+        }
+
+        return Tareas;
+    }
+
     public Tarea ModificarTarea(int idTarea, Tarea TareaModificar){
     int rowAffected = 0;
     using(var connection = new SQLiteConnection(connectionString))
@@ -237,6 +267,26 @@ de tareas)
     return true ;
 }
     
+     public int CantidadTareasPorEstado(int estado){
+        int rowAffected = 0;
+        using(var connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+            
+            string queryString = @"SELECT COUNT(*) FROM Tarea WHERE estado = @estado;";
+            var command = new SQLiteCommand(queryString, connection);
+            command.Parameters.Add(new SQLiteParameter("@estado", estado));
+
+            rowAffected = Convert.ToInt32( command.ExecuteScalar());
+            connection.Close();
+        }
+         if (rowAffected<1)
+        {
+            return 0 ;
+        
+        }
+        return rowAffected;
+    }
     public bool EliminarTarea(int idTarea){
         int rowAffected = 0;
         using(var connection = new SQLiteConnection(connectionString))
