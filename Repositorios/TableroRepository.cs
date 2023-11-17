@@ -7,11 +7,13 @@ public class TableroRepository
     private string connectionString = @"Data Source = DB/kanban.db;Initial Catalog=Northwind;Integrated Security=true";
 
 /*
-● Crear un nuevo Tablero. (recibe un objeto Tablero)
-● Modificar un Tablero existente. (recibe un Id y un objeto Tablero)
-● Listar todos los Tableros registrados. (devuelve un List de Tableros)
-● Obtener detalles de un Tablero por su ID. (recibe un Id y devuelve un Tablero)
-● Eliminar un Tablero por ID
+Crear un nuevo tablero (devuelve un objeto Tablero)
+● Modificar un tablero existente (recibe un id y un objeto Tablero)
+● Obtener detalles de un tablero por su ID. (recibe un id y devuelve un Tablero)
+● Listar todos los tableros existentes (devuelve un list de tableros)
+● Listar todos los tableros de un usuario específico. (recibe un IdUsuario, devuelve un
+list de tableros)
+● Eliminar un tablero por ID
 */
     public TableroPost CrearTablero(TableroPost nuevoTablero){
         int rowAffected = 0;
@@ -113,6 +115,37 @@ public class TableroRepository
         }
 
         return buscado;
+    }
+
+    /*● Listar todos los tableros de un usuario específico. (recibe un IdUsuario, devuelve un
+list de tableros)*/
+public List<Tablero> MostrarPorUsuarioId(int idUsuario){
+        List<Tablero> Tableros = new List<Tablero>();
+         using(var connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+            string queryString = @"SELECT * FROM Tablero WHERE id_usuario_propietario = @idUsuario;";
+            var command = new SQLiteCommand(queryString, connection);
+            command.Parameters.Add(new SQLiteParameter("@idUsuario", idUsuario));
+
+            using(var reader = command.ExecuteReader())
+            {
+                while(reader.Read()){
+                    var Tablero = new Tablero();
+                    Tablero.Id = Convert.ToInt32(reader["id"]);
+                    Tablero.Nombre = reader["Nombre"].ToString();
+                    Tablero.Descripcion = reader["descripcion"].ToString();
+                    Tablero.Id_usuario_propietario=Convert.ToInt32(reader["id_usuario_propietario"]);
+                    Tableros.Add(Tablero);
+                }
+            }
+            connection.Close();
+        }
+        if(Tableros.Count == 0){
+            return null;
+        }
+
+        return Tableros;
     }
 
 

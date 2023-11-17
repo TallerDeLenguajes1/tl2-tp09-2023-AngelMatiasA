@@ -27,6 +27,18 @@ public class TableroController : ControllerBase
         return Ok(Tableros);
     }
 
+     [HttpGet]
+    [Route("/api/Tablero/ObtenerPorUsuarioId")]
+    public ActionResult<Tablero> GetTableroPorUsuarioId(int idUsuario)
+    {
+        var encontrado = TableroRepo.MostrarPorUsuarioId(idUsuario);
+        if (encontrado == null)
+        {
+            return BadRequest("El usuario no tiene Tableros almacenados en la base de datos");
+        }
+        return Ok(encontrado);
+    }
+
     [HttpGet]
     [Route("/api/Tablero/ObtenerPorId{id}")]
     public ActionResult<Tablero> GetTableroPorId(int id)
@@ -38,6 +50,7 @@ public class TableroController : ControllerBase
         }
         return Ok(encontrado);
     }
+
 
     [HttpPost("/api/Tablero/Crear")]
     public ActionResult<string> CrearTablero(TableroPost nuevoTablero)
